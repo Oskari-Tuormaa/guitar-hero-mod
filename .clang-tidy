@@ -1,0 +1,25 @@
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  modernize-*,
+  misc-*,
+  llvm-*,
+  -modernize-use-trailing-return-type
+
+CheckOptions:
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.TemplateParameterCase: CamelCase
+  readability-identifier-naming.TypeAliasCase: CamelCase
+
+  readability-identifier-naming.VariableCase: lower_case
+  readability-identifier-naming.ParameterCase: lower_case
+  readability-identifier-naming.MemberCase: lower_case
+  readability-identifier-naming.ClassMethodCase: lower_case
+
+  readability-identifier-naming.PrivateMemberPrefix: m_
+
+
+  readability-function-cognitive-complexity.IgnoreMacros: true
+
+FormatStyle: file
