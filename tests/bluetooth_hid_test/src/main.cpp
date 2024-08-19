@@ -13,14 +13,14 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "btstack.h"
+#include <btstack.h>
 
 #ifdef HAVE_BTSTACK_STDIN
 #include "btstack_stdin.h"
 #endif
 
 // to enable demo text on POSIX systems
-/*#undef HAVE_BTSTACK_STDIN*/
+#undef HAVE_BTSTACK_STDIN
 
 // timing of keypresses
 #define TYPING_KEYDOWN_MS  20
@@ -322,6 +322,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * pack
                             }
                             app_state = APP_CONNECTED;
                             hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
+                            has_sent_message = false;
 #ifdef HAVE_BTSTACK_STDIN                        
                             printf("HID Connected, please start typing...\n");
 #else                        
