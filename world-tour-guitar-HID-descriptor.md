@@ -36,4 +36,7 @@ This is a document describing which physical buttons are mapped to which usages.
 
 The convention I will be using for the accelerometer axes, is as follows:
 
-    Imagine holding the guitar in front of you, with the wide face of the guitar containing the strum bar facing you and the fret board pointing to the left. In this case the positive X axis is to the left, the positive Y axis is away from you and the positive Z axis is up.
+    Imagine holding the guitar in front of you, with the wide face of the
+    guitar containing the strum bar facing you and the fret board pointing to
+    the left. In this case the positive X axis is to the left, the positive
+    Y axis is away from you and the positive Z axis is up.
