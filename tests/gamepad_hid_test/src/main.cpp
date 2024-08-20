@@ -1,5 +1,6 @@
 #include <btstack.h>
 
+#include <cstring>
 #include <pico/cyw43_arch.h>
 #include <pico/stdlib.h>
 
@@ -7,10 +8,10 @@
 
 #include <cinttypes>
 
+#include "hid_stuff.h"
+
 namespace config
 {
-    constexpr uint8_t report_id = 0x01;
-
     constexpr uint16_t class_of_device = 0x508;
 
     constexpr auto device_name = "Custom gamepad";
@@ -18,7 +19,7 @@ namespace config
     constexpr uint16_t product_id = 1;
     constexpr uint16_t version    = 1;
 
-    constexpr uint32_t dummy_report_timeout_ms = 50;
+    constexpr uint32_t dummy_report_timeout_ms = 100;
 
     namespace hid
     {
@@ -48,11 +49,7 @@ namespace globals
 
     static uint16_t hid_cid;
 
-    static uint16_t buttons = 1;
-    static uint8_t  x       = 0;
-    static uint8_t  y       = 0;
-    static uint8_t  rx      = 0;
-    static uint8_t  ry      = 0;
+    static report_t report;
 
     namespace timers
     {
@@ -60,58 +57,14 @@ namespace globals
     } // namespace timers
 } // namespace globals
 
-static auto hid_descriptor = std::to_array<uint8_t>({
-    // clang-format off
-    0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
-    0x09, 0x05,                    // USAGE (Game Pad)
-    0xa1, 0x01,                    // COLLECTION (Application)
-    0xa1, 0x00,                    //     COLLECTION (Physical)
-
-    // ReportID - 8 bits
-    0x85, config::report_id,       //     REPORT_ID (1)
-
-    // X & Y -> 2x8 = 16 bits
-    0x05, 0x01,                  //     USAGE_PAGE (Generic Desktop)
-    0x09, 0x30,                  //     USAGE (X)
-    0x09, 0x31,                  //     USAGE (Y)
-    0x09, 0x33,                  //     USAGE (Rx)
-    0x09, 0x34,                  //     USAGE (Ry)
-    0x15, 0x81,                  //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                  //     LOGICAL_MAXIMUM (127)
-    0x75, 0x08,                  //     REPORT_SIZE (8)
-    0x95, 0x04,                  //     REPORT_COUNT (4)
-    0x81, 0x02,                  //     INPUT (Data,Var,Abs)
-
-    // Buttons - 8 bits
-    0x05, 0x09,                  //     USAGE_PAGE (Button)
-    0x19, 0x01,                  //     USAGE_MINIMUM (Button 1)
-    0x29, 0x08,                  //     USAGE_MAXIMUM (Button 8)
-    0x15, 0x00,                  //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                  //     LOGICAL_MAXIMUM (1)
-    0x75, 0x01,                  //     REPORT_SIZE (1)
-    0x95, 0x08,                  //     REPORT_COUNT (8)
-    0x81, 0x02,                  //     INPUT (Data,Var,Abs)
-
-    // Buttons - 8 bits
-    0x05, 0x09,                  //     USAGE_PAGE (Button)
-    0x19, 0x09,                  //     USAGE_MINIMUM (Button 9)
-    0x29, 0x11,                  //     USAGE_MAXIMUM (Button 16)
-    0x15, 0x00,                  //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                  //     LOGICAL_MAXIMUM (1)
-    0x75, 0x01,                  //     REPORT_SIZE (1)
-    0x95, 0x08,                  //     REPORT_COUNT (8)
-    0x81, 0x02,                  //     INPUT (Data,Var,Abs)
-
-    0xc0,                             //     END_COLLECTION
-    0xc0,                             // END_COLLECTION
-    // clang-format on
-});
-
-void send_report(uint8_t x, uint8_t y, uint8_t rx, uint8_t ry, uint16_t button)
+void send_report(report_t report)
 {
-    auto message = std::to_array<uint8_t>(
-        { 0xa1, config::report_id, x, y, rx, ry,
-          static_cast<uint8_t>(button >> 8), static_cast<uint8_t>(button) });
+    std::array<uint8_t, 2 + sizeof(report)> message {
+        0xa1,
+        config::report_id,
+    };
+
+    std::memcpy(&message[2], &report, sizeof(report));
 
     hid_device_send_interrupt_message(globals::hid_cid, message.begin(),
                                       message.size());
@@ -121,12 +74,36 @@ void dummy_report_handler(btstack_timer_source_t* ts)
 {
     if (globals::connected)
     {
-        globals::x += 10;
-        globals::y += 5;
-        globals::rx += 20;
-        globals::ry += 10;
-        globals::buttons
-            = globals::buttons == 0x8000 ? 1 : globals::buttons << 1;
+        globals::report.x += 10;
+        globals::report.y += 5;
+        globals::report.rx += 20;
+        globals::report.ry += 10;
+        globals::report.z += 10;
+        globals::report.rz += 10;
+
+        uint8_t tmp         = globals::report.b1;
+        globals::report.b1  = globals::report.b2;
+        globals::report.b2  = globals::report.b3;
+        globals::report.b3  = globals::report.b4;
+        globals::report.b4  = globals::report.b5;
+        globals::report.b5  = globals::report.b6;
+        globals::report.b6  = globals::report.b7;
+        globals::report.b7  = globals::report.b8;
+        globals::report.b8  = globals::report.b9;
+        globals::report.b9  = globals::report.b10;
+        globals::report.b10 = globals::report.b11;
+        globals::report.b11 = globals::report.b12;
+        globals::report.b12 = globals::report.b13;
+        globals::report.b13 = globals::report.b14;
+        globals::report.b14 = globals::report.b15;
+        globals::report.b15 = globals::report.b16;
+        globals::report.b16 = globals::report.b17;
+        globals::report.b17 = tmp;
+
+        globals::report.hat += 1;
+        if (globals::report.hat > 7)
+            globals::report.hat = 0;
+
         hid_device_request_can_send_now_event(globals::hid_cid);
     }
 
@@ -160,8 +137,7 @@ void hid_event_handler(uint8_t* packet)
         globals::connected = false;
         break;
     case HID_SUBEVENT_CAN_SEND_NOW:
-        send_report(globals::x, globals::y, globals::rx, globals::ry,
-                    globals::buttons);
+        send_report(globals::report);
         break;
     default:
         printf("Unknown HID subevent: 0x%02x\r\n", subevent_type);
@@ -268,6 +244,10 @@ int main()
 {
     stdio_init_all();
     printf("Hello!\r\n");
+
+    std::memset(&globals::report, 0, sizeof(globals::report));
+    globals::report.b1  = 1;
+    globals::report.hat = 1;
 
     cyw43_arch_init();
 
