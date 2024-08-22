@@ -10,6 +10,19 @@
 
 #include "hid_stuff.h"
 
+enum class AppInitState
+{
+    TRYING,
+    DONE,
+};
+
+enum class DummyOutputState
+{
+    PRESS_START,
+    PRESS_DOWN,
+    PRESS_UP,
+};
+
 namespace config
 {
     constexpr uint16_t class_of_device = 0x508;
@@ -19,7 +32,10 @@ namespace config
     constexpr uint16_t product_id = 1;
     constexpr uint16_t version    = 1;
 
-    constexpr uint32_t dummy_report_timeout_ms = 100;
+    constexpr uint32_t dummy_report_timeout_ms = 1;
+
+    constexpr uint32_t dummy_start_timeout_ms = 2'000;
+    constexpr uint32_t dummy_stop_timeout_ms  = 20'000;
 
     namespace hid
     {
@@ -43,7 +59,8 @@ namespace globals
     static std::array<uint8_t, 300> hid_service_buffer;
     static std::array<uint8_t, 100> device_id_sdp_service_buffer;
 
-    static bool connected = false;
+    static bool connected     = false;
+    static bool dummy_running = false;
 
     static btstack_packet_callback_registration_t packet_callbacks;
 
@@ -51,11 +68,48 @@ namespace globals
 
     static report_t report;
 
+    static int dummy_output_state = 0;
+
+    static AppInitState                app_init_state { AppInitState::TRYING };
+    static btstack_link_key_iterator_t link_key_it;
+
     namespace timers
     {
         static btstack_timer_source_t dummy_report;
+        static btstack_timer_source_t dummy_start_stop;
     } // namespace timers
 } // namespace globals
+
+void link_key_iterator_init()
+{
+    gap_link_key_iterator_init(&globals::link_key_it);
+}
+
+void link_key_iterator_done()
+{
+    gap_link_key_iterator_done(&globals::link_key_it);
+}
+
+void link_key_iterator_try_next()
+{
+    bd_addr_t       addr;
+    link_key_t      link_key;
+    link_key_type_t type;
+
+    if (gap_link_key_iterator_get_next(&globals::link_key_it, addr, link_key,
+                                       &type))
+    {
+        printf("Trying to connect to %s - type %u...\n", bd_addr_to_str(addr),
+               (int)type);
+        hid_device_connect(addr, &globals::hid_cid);
+    }
+    else
+    {
+        printf("Done trying...\n");
+        link_key_iterator_done();
+        globals::app_init_state = AppInitState::DONE;
+    }
+}
 
 void send_report(report_t report)
 {
@@ -74,35 +128,80 @@ void dummy_report_handler(btstack_timer_source_t* ts)
 {
     if (globals::connected)
     {
-        globals::report.x += 10;
-        globals::report.y += 5;
-        globals::report.rx += 20;
-        globals::report.ry += 10;
-        globals::report.z += 10;
-        globals::report.rz += 10;
+#if 1
+        if (globals::dummy_running)
+        {
+            if (globals::dummy_output_state % 10 == 5)
+            {
+                globals::report.hat = HatSwitchDirections::HATSWITCH_DOWN;
+            }
+            else if ((globals::dummy_output_state % 10) == 6)
+            {
+                globals::report.hat = HatSwitchDirections::HATSWITCH_NONE;
+            }
 
-        uint8_t tmp         = globals::report.b1;
-        globals::report.b1  = globals::report.b2;
-        globals::report.b2  = globals::report.b3;
-        globals::report.b3  = globals::report.b4;
-        globals::report.b4  = globals::report.b5;
-        globals::report.b5  = globals::report.b6;
-        globals::report.b6  = globals::report.b7;
-        globals::report.b7  = globals::report.b8;
-        globals::report.b8  = globals::report.b9;
-        globals::report.b9  = globals::report.b10;
-        globals::report.b10 = globals::report.b11;
-        globals::report.b11 = globals::report.b12;
-        globals::report.b12 = globals::report.b13;
-        globals::report.b13 = globals::report.b14;
-        globals::report.b14 = globals::report.b15;
-        globals::report.b15 = globals::report.b16;
-        globals::report.b16 = globals::report.b17;
-        globals::report.b17 = tmp;
+            switch ((globals::dummy_output_state / 10) % 5)
+            {
+            case 0:
+                globals::report.b4 = false;
+                globals::report.b0 = true;
+                break;
+            case 1:
+                globals::report.b0 = false;
+                globals::report.b1 = true;
+                break;
+            case 2:
+                globals::report.b1 = false;
+                globals::report.b2 = true;
+                break;
+            case 3:
+                globals::report.b2 = false;
+                globals::report.b3 = true;
+                break;
+            case 4:
+                globals::report.b3 = false;
+                globals::report.b4 = true;
+                break;
+            }
+
+            globals::dummy_output_state++;
+        }
+        else
+        {
+            globals::report.hat = HatSwitchDirections::HATSWITCH_NONE;
+            globals::report.b0  = false;
+            globals::report.b1  = false;
+            globals::report.b2  = false;
+            globals::report.b3  = false;
+            globals::report.b4  = false;
+        }
+#else
+        globals::report.x  += 1;
+        globals::report.y  += 2;
+        globals::report.rx += 3;
+        globals::report.ry += 4;
+        globals::report.z  += 5;
+        globals::report.rz += 6;
+
+        uint8_t tmp         = globals::report.b18;
+        globals::report.b18 = globals::report.b17;
+        globals::report.b17 = globals::report.b16;
+        globals::report.b16 = globals::report.b9;
+        globals::report.b9  = globals::report.b8;
+        globals::report.b8  = globals::report.b7;
+        globals::report.b7  = globals::report.b6;
+        globals::report.b6  = globals::report.b5;
+        globals::report.b5  = globals::report.b4;
+        globals::report.b4  = globals::report.b3;
+        globals::report.b3  = globals::report.b2;
+        globals::report.b2  = globals::report.b1;
+        globals::report.b1  = globals::report.b0;
+        globals::report.b0  = tmp;
 
         globals::report.hat += 1;
         if (globals::report.hat > 7)
             globals::report.hat = 0;
+#endif
 
         hid_device_request_can_send_now_event(globals::hid_cid);
     }
@@ -112,6 +211,24 @@ void dummy_report_handler(btstack_timer_source_t* ts)
     btstack_run_loop_add_timer(ts);
 }
 
+void dummy_start_stop_handler(btstack_timer_source_t* ts)
+{
+    if (globals::dummy_running)
+    {
+        printf("Stopping dummy output\n");
+        globals::dummy_running = false;
+    }
+    else
+    {
+        printf("Starting dummy output for %d ms\n",
+               config::dummy_stop_timeout_ms);
+        globals::dummy_running = true;
+
+        btstack_run_loop_set_timer(ts, config::dummy_stop_timeout_ms);
+        btstack_run_loop_add_timer(ts);
+    }
+}
+
 void hid_event_handler(uint8_t* packet)
 {
     uint8_t status;
@@ -119,17 +236,31 @@ void hid_event_handler(uint8_t* packet)
     switch (subevent_type)
     {
     case HID_SUBEVENT_CONNECTION_OPENED:
-        printf("Connection opened\r\n");
         status = hid_subevent_connection_opened_get_status(packet);
         if (status != ERROR_CODE_SUCCESS)
         {
             printf("Connection failed, status 0x%x\r\n", status);
             globals::hid_cid   = 0;
             globals::connected = false;
+
+            if (globals::app_init_state == AppInitState::TRYING)
+            {
+                link_key_iterator_try_next();
+            }
+
             return;
         }
+        printf("Connection opened\r\n");
         globals::hid_cid   = hid_subevent_connection_opened_get_hid_cid(packet);
         globals::connected = true;
+        globals::app_init_state = AppInitState::DONE;
+
+        globals::dummy_output_state = 0;
+        btstack_run_loop_set_timer_handler(&globals::timers::dummy_start_stop,
+                                           dummy_start_stop_handler);
+        btstack_run_loop_set_timer(&globals::timers::dummy_start_stop,
+                                   config::dummy_start_timeout_ms);
+        btstack_run_loop_add_timer(&globals::timers::dummy_start_stop);
         break;
     case HID_SUBEVENT_CONNECTION_CLOSED:
         printf("Connection closed\r\n");
@@ -162,6 +293,14 @@ void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* packet,
     case BTSTACK_EVENT_STATE:
         state = btstack_event_state_get_state(packet);
         printf("New BT state: 0x%02x\r\n", state);
+
+        if (state == HCI_STATE_WORKING
+            && globals::app_init_state == AppInitState::TRYING)
+        {
+            link_key_iterator_init();
+            link_key_iterator_try_next();
+        }
+
         break;
 
     case HCI_EVENT_USER_CONFIRMATION_REQUEST:
@@ -246,8 +385,7 @@ int main()
     printf("Hello!\r\n");
 
     std::memset(&globals::report, 0, sizeof(globals::report));
-    globals::report.b1  = 1;
-    globals::report.hat = 1;
+    globals::report.b0 = false;
 
     cyw43_arch_init();
 
