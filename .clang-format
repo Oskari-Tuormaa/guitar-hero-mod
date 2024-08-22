@@ -5,11 +5,18 @@ AccessModifierOffset: -4
 
 AlignAfterOpenBracket: Align
 AlignConsecutiveDeclarations: Consecutive
-AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveMacros: Consecutive
 AlignOperands: AlignAfterOperator
 AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: Inline
+
+AlignConsecutiveAssignments:
+    Enabled: true
+    AcrossEmptyLines: false
+    AcrossComments: true
+    AlignCompound: true
+    AlignFunctionPointers: true
+    PadOperators: true
 
 NamespaceIndentation: All
 
