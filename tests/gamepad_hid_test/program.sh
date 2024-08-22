@@ -5,6 +5,7 @@ cmake --build build -j30 && \
         -f target/rp2040.cfg \
         -c "adapter speed 4000" \
         -c "init" \
+        -c "reset halt" \
 		-c "program build/gamepad_hid_test.elf verify" \
 		-c "reset run" \
 		-c "shutdown"
