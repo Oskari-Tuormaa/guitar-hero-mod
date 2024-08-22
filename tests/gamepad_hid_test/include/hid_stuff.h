@@ -57,7 +57,7 @@ static auto hid_descriptor = std::to_array<uint8_t>({
     0x95, 0x01,                  //     REPORT_COUNT (1)
     0x81, 0x02,                  //     INPUT (Data,Var,Abs)
 
-    // Buttons
+    // Buttons = 17 bits
     0x05, 0x09,                  //     USAGE_PAGE (Button)
     0x19, 0x01,                  //     USAGE_MINIMUM (1)
     0x29, 0x11,                  //     USAGE_MAXIMUM (17)
@@ -65,7 +65,12 @@ static auto hid_descriptor = std::to_array<uint8_t>({
     0x95, 0x11,                  //     REPORT_COUNT (17)
     0x81, 0x02,                  //     INPUT (Data,Var,Abs)
 
-    // Hat switch
+    // Padding to byte align the hat switch data = 7 bits
+    0x75, 0x01,                  //     REPORT_SIZE (1)
+    0x95, 0x07,                  //     REPORT_COUNT (7)
+    0x81, 0x03,                  //     INPUT (Cnst,Var,Abs)
+
+    // Hat switch = 4 bits
     0x05, 0x01,                  //     USAGE_PAGE (Generic Desktop)
     0x09, 0x39,                  //     USAGE (Hat switch)
     0x15, 0x00,                  //     LOGICAL_MINIMUM (0)
@@ -76,6 +81,11 @@ static auto hid_descriptor = std::to_array<uint8_t>({
     0x75, 0x04,                  //     REPORT_SIZE (4)
     0x95, 0x01,                  //     REPORT_COUNT (1)
     0x81, 0x42,                 //     INPUT (Data,Var,Abs)
+
+    // Padding to complete the byte for the hat switch
+    0x95, 0x04,                  //     REPORT_SIZE (4)
+    0x75, 0x01,                  //     REPORT_COUNT (1)
+    0x81, 0x03,                  //     INPUT (Cnst,Var,Abs)
 
     0xc0,                             //     END_COLLECTION
     0xc0,                             // END_COLLECTION
@@ -111,5 +121,9 @@ using report_t = struct
     uint8_t b16 : 1;
     uint8_t b17 : 1;
 
+    uint8_t pad1 : 7;
+
     uint8_t hat : 4;
+
+    uint8_t pad2 : 4;
 };
