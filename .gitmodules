@@ -1,3 +1,6 @@
 [submodule "pico-sdk"]
 	path = 3rdparty/pico-sdk
 	url = git@github.com:raspberrypi/pico-sdk.git
+[submodule "3rdparty/scottokeebs"]
+	path = 3rdparty/scottokeebs
+	url = git@github.com:joe-scotto/scottokeebs.git
