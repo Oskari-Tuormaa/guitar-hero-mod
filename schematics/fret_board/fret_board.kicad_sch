@@ -766,16 +766,16 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x06")
-		(at 172.72 83.82 0)
+		(at 172.72 86.36 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "100936ad-4e94-4029-8453-3e4d65144ba7")
 		(property "Reference" "J1"
-			(at 175.26 83.8199 0)
+			(at 175.26 86.3601 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -784,7 +784,7 @@
 			)
 		)
 		(property "Value" "Conn_01x06"
-			(at 175.26 86.3599 0)
+			(at 175.26 83.8201 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -793,7 +793,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x06_P2.00mm_Vertical"
-			(at 172.72 83.82 0)
+			(at 172.72 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -802,7 +802,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 172.72 83.82 0)
+			(at 172.72 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -811,7 +811,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 83.82 0)
+			(at 172.72 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -968,10 +968,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c7f")
+			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c80")
 		)
 		(pin "1"
-			(uuid "186d206b-35c6-446a-bdc9-12116f409f31")
+			(uuid "186d206b-35c6-446a-bdc9-12116f409f32")
 		)
 		(instances
 			(project "fret_board"
@@ -1035,10 +1035,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c7f")
+			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c81")
 		)
 		(pin "1"
-			(uuid "186d206b-35c6-446a-bdc9-12116f409f31")
+			(uuid "186d206b-35c6-446a-bdc9-12116f409f33")
 		)
 		(instances
 			(project "fret_board"
@@ -1235,10 +1235,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c7f")
+			(uuid "3160228a-03c5-4eb3-b076-dd1e70928c82")
 		)
 		(pin "1"
-			(uuid "186d206b-35c6-446a-bdc9-12116f409f31")
+			(uuid "186d206b-35c6-446a-bdc9-12116f409f34")
 		)
 		(instances
 			(project "fret_board"
