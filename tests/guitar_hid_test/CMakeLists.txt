@@ -4,7 +4,7 @@ set(PICO_BOARD pico_w)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-include(../../pico-sdk/pico_sdk_init.cmake)
+include(../../3rdparty/pico-sdk/pico_sdk_init.cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
