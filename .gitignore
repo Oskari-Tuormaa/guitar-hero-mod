@@ -31,6 +31,11 @@
 *.out
 *.app
 
+# Ignore temporary KiCAD stuff
+*-backups/
+~*.lck
+fp-info-cache
+
 .cache/
 build/
 
