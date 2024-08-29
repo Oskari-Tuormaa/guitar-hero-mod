@@ -1563,7 +1563,7 @@
 		(descr "Through hole straight pin header, 1x06, 2.00mm pitch, single row")
 		(tags "Through hole pin header THT 1x06 2.00mm single row")
 		(property "Reference" "J1"
-			(at 0 -2.06 360)
+			(at 0 -2.06 0)
 			(layer "F.SilkS")
 			(uuid "d092f482-2073-4b81-b30d-975d2a732e00")
 			(effects
@@ -1574,7 +1574,7 @@
 			)
 		)
 		(property "Value" "Conn_01x06"
-			(at 0 12.06 360)
+			(at 0 12.06 0)
 			(layer "F.Fab")
 			(uuid "e55ce9c6-0b1a-45cf-9204-7819228cdc96")
 			(effects
@@ -2209,7 +2209,7 @@
 		(net 6)
 		(net_name "GND")
 		(layer "F.Cu")
-		(uuid "82bd4945-cad0-4c89-98be-38f901f675f0")
+		(uuid "37eccb29-e56e-4c63-bbd1-dc14a98210bb")
 		(hatch edge 0.5)
 		(connect_pads
 			(clearance 0.5)
@@ -2222,7 +2222,7 @@
 		)
 		(polygon
 			(pts
-				(xy 232 79.5) (xy 235 120) (xy 77.5 121) (xy 79 80) (xy 88.5 78.5)
+				(xy 230.5 81) (xy 230.5 116) (xy 79 116) (xy 79 81)
 			)
 		)
 		(filled_polygon
