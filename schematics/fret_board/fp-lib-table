@@ -13,4 +13,5 @@
   (lib (name "ScottoKeebs_Choc")(type "KiCad")(uri "/home/oskari/repos/guitar-hero-mod/3rdparty/scottokeebs/Extras/ScottoKicad/footprints/ScottoKeebs_Choc.pretty")(options "")(descr ""))
   (lib (name "ScottoKeebs_CAD")(type "KiCad")(uri "/home/oskari/repos/guitar-hero-mod/3rdparty/scottokeebs/Extras/ScottoKicad/footprints/ScottoKeebs_CAD.pretty")(options "")(descr ""))
   (lib (name "ScottoKeebs_Alps")(type "KiCad")(uri "/home/oskari/repos/guitar-hero-mod/3rdparty/scottokeebs/Extras/ScottoKicad/footprints/ScottoKeebs_Alps.pretty")(options "")(descr ""))
+  (lib (name "custom_footprints")(type "KiCad")(uri "/home/oskari/repos/guitar-hero-mod/schematics/custom_footprints.pretty")(options "")(descr ""))
 )
