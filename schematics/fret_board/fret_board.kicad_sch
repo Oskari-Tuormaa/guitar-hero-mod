@@ -5,22 +5,22 @@
 	(uuid "9d371a9e-2977-429d-aa3c-ee2d51781e3b")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Connector_Generic:Conn_01x06"
+		(symbol "Connector_Generic:Conn_01x08"
 			(pin_names
 				(offset 1.016) hide)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "J"
-				(at 0 7.62 0)
+				(at 0 10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "Conn_01x06"
-				(at 0 -10.16 0)
+			(property "Value" "Conn_01x08"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -45,7 +45,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(property "Description" "Generic connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -72,7 +72,18 @@
 					(hide yes)
 				)
 			)
-			(symbol "Conn_01x06_1_1"
+			(symbol "Conn_01x08_1_1"
+				(rectangle
+					(start -1.27 -10.033)
+					(end 0 -10.287)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(rectangle
 					(start -1.27 -7.493)
 					(end 0 -7.747)
@@ -140,8 +151,19 @@
 					)
 				)
 				(rectangle
-					(start -1.27 6.35)
-					(end 1.27 -8.89)
+					(start -1.27 7.747)
+					(end 0 7.493)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 8.89)
+					(end 1.27 -11.43)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -151,7 +173,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 5.08 0)
+					(at -5.08 7.62 0)
 					(length 3.81)
 					(name "Pin_1"
 						(effects
@@ -169,7 +191,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 2.54 0)
+					(at -5.08 5.08 0)
 					(length 3.81)
 					(name "Pin_2"
 						(effects
@@ -187,7 +209,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 0 0)
+					(at -5.08 2.54 0)
 					(length 3.81)
 					(name "Pin_3"
 						(effects
@@ -205,7 +227,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 -2.54 0)
+					(at -5.08 0 0)
 					(length 3.81)
 					(name "Pin_4"
 						(effects
@@ -223,7 +245,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 -5.08 0)
+					(at -5.08 -2.54 0)
 					(length 3.81)
 					(name "Pin_5"
 						(effects
@@ -241,7 +263,7 @@
 					)
 				)
 				(pin passive line
-					(at -5.08 -7.62 0)
+					(at -5.08 -5.08 0)
 					(length 3.81)
 					(name "Pin_6"
 						(effects
@@ -251,6 +273,42 @@
 						)
 					)
 					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -7.62 0)
+					(length 3.81)
+					(name "Pin_7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -10.16 0)
+					(length 3.81)
+					(name "Pin_8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -514,6 +572,14 @@
 		(color 0 0 0 0)
 		(uuid "d92f12f1-4963-4d95-825a-ef33cc8d3066")
 	)
+	(no_connect
+		(at 167.64 73.66)
+		(uuid "0b5d74ec-4735-4117-a18e-930ccd4260f6")
+	)
+	(no_connect
+		(at 167.64 76.2)
+		(uuid "f3852942-db4f-4082-9ae7-bb4b2a6e0b3f")
+	)
 	(wire
 		(pts
 			(xy 157.48 96.52) (xy 157.48 83.82)
@@ -765,90 +831,8 @@
 		(uuid "fcc76a97-7d9e-454f-a619-0c53ce42fda3")
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x06")
-		(at 172.72 86.36 0)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "100936ad-4e94-4029-8453-3e4d65144ba7")
-		(property "Reference" "J1"
-			(at 175.26 86.3601 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Conn_01x06"
-			(at 175.26 83.8201 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x06_P2.00mm_Vertical"
-			(at 172.72 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 172.72 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "4"
-			(uuid "5fb001e0-fc48-4da3-8406-499e9cd10ae3")
-		)
-		(pin "5"
-			(uuid "dc61f4f9-90ef-40ae-8f6c-7ef9da0d61bf")
-		)
-		(pin "3"
-			(uuid "56629ed6-bbcc-41a7-aa0b-c07152594473")
-		)
-		(pin "1"
-			(uuid "6d7dff54-c13d-4a4f-9b51-4a4b4f7f84ab")
-		)
-		(pin "2"
-			(uuid "a0319d3e-06a2-4d1e-81e6-a84d309025fc")
-		)
-		(pin "6"
-			(uuid "be39cb31-2072-4bc9-9d73-d400522ffc05")
-		)
-		(instances
-			(project ""
-				(path "/9d371a9e-2977-429d-aa3c-ee2d51781e3b"
-					(reference "J1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 142.24 87.63 0)
+		(at 142.24 105.41 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -857,7 +841,7 @@
 		(fields_autoplaced yes)
 		(uuid "2e328507-e50a-4377-a09a-0b48c711dca9")
 		(property "Reference" "SW2"
-			(at 142.24 81.28 0)
+			(at 142.24 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -865,7 +849,7 @@
 			)
 		)
 		(property "Value" "Red"
-			(at 142.24 83.82 0)
+			(at 142.24 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -873,7 +857,7 @@
 			)
 		)
 		(property "Footprint" "custom_footprints:Choc_V1_sunken"
-			(at 142.24 87.63 0)
+			(at 142.24 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -882,7 +866,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 142.24 87.63 0)
+			(at 142.24 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -891,7 +875,7 @@
 			)
 		)
 		(property "Description" "Single Pole Single Throw (SPST) switch"
-			(at 142.24 87.63 0)
+			(at 142.24 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -916,7 +900,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 142.24 114.3 0)
+		(at 142.24 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -925,7 +909,7 @@
 		(fields_autoplaced yes)
 		(uuid "33954e73-5c18-4bc7-9811-fceff045f8bc")
 		(property "Reference" "SW5"
-			(at 142.24 108.3282 0)
+			(at 142.24 72.7682 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -933,7 +917,7 @@
 			)
 		)
 		(property "Value" "Orange"
-			(at 142.24 110.8682 0)
+			(at 142.24 75.3082 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -941,7 +925,7 @@
 			)
 		)
 		(property "Footprint" "custom_footprints:Choc_V1_sunken"
-			(at 142.24 114.3 0)
+			(at 142.24 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -950,7 +934,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 142.24 114.3 0)
+			(at 142.24 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -959,7 +943,7 @@
 			)
 		)
 		(property "Description" "Single Pole Single Throw (SPST) switch"
-			(at 142.24 114.3 0)
+			(at 142.24 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1044,6 +1028,94 @@
 			(project "fret_board"
 				(path "/9d371a9e-2977-429d-aa3c-ee2d51781e3b"
 					(reference "SW3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x08")
+		(at 172.72 83.82 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "62ad296f-9ad9-4bf0-8551-b84eb29c11a7")
+		(property "Reference" "J1"
+			(at 175.26 83.8201 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x08"
+			(at 175.26 81.2801 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x08_P2.00mm_Vertical"
+			(at 172.72 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 172.72 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 172.72 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "6"
+			(uuid "b1bf58a7-d569-4e7e-840c-ce97d4599378")
+		)
+		(pin "2"
+			(uuid "6460be1f-5429-4ce2-a249-af9a04f015e2")
+		)
+		(pin "5"
+			(uuid "63ba6dea-937a-40e7-a6bc-72c99ae1c85b")
+		)
+		(pin "4"
+			(uuid "93215376-b1ab-42e7-b195-6c1f837964a8")
+		)
+		(pin "3"
+			(uuid "3c24a5fc-d0e0-48bc-a541-2b5897a49fba")
+		)
+		(pin "1"
+			(uuid "15a33fa3-5fd2-4e04-a378-b7ba7f0ab3fc")
+		)
+		(pin "8"
+			(uuid "07d194b0-7da3-436e-b81d-7e23cbcabd30")
+		)
+		(pin "7"
+			(uuid "a8a5cf62-85a3-4917-aab5-7e31710583d8")
+		)
+		(instances
+			(project ""
+				(path "/9d371a9e-2977-429d-aa3c-ee2d51781e3b"
+					(reference "J1")
 					(unit 1)
 				)
 			)
@@ -1183,7 +1255,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 142.24 105.41 0)
+		(at 142.24 87.63 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1192,7 +1264,7 @@
 		(fields_autoplaced yes)
 		(uuid "c6489bf5-d523-406a-9d98-892643b7a421")
 		(property "Reference" "SW4"
-			(at 142.24 99.4382 0)
+			(at 142.24 81.6582 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1200,7 +1272,7 @@
 			)
 		)
 		(property "Value" "Blue"
-			(at 142.24 101.9782 0)
+			(at 142.24 84.1982 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1208,7 +1280,7 @@
 			)
 		)
 		(property "Footprint" "custom_footprints:Choc_V1_sunken"
-			(at 142.24 105.41 0)
+			(at 142.24 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1217,7 +1289,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 142.24 105.41 0)
+			(at 142.24 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1226,7 +1298,7 @@
 			)
 		)
 		(property "Description" "Single Pole Single Throw (SPST) switch"
-			(at 142.24 105.41 0)
+			(at 142.24 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1251,16 +1323,15 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 142.24 78.74 0)
+		(at 142.24 114.3 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "effe6a3c-8bc7-4e25-89a0-409f4c330339")
 		(property "Reference" "SW1"
-			(at 142.24 72.39 0)
+			(at 142.24 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1268,7 +1339,7 @@
 			)
 		)
 		(property "Value" "Green"
-			(at 142.24 74.93 0)
+			(at 142.24 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1276,7 +1347,7 @@
 			)
 		)
 		(property "Footprint" "custom_footprints:Choc_V1_sunken"
-			(at 142.24 78.74 0)
+			(at 142.24 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1285,7 +1356,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 142.24 78.74 0)
+			(at 142.24 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1294,7 +1365,7 @@
 			)
 		)
 		(property "Description" "Single Pole Single Throw (SPST) switch"
-			(at 142.24 78.74 0)
+			(at 142.24 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
