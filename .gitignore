@@ -38,6 +38,10 @@ fp-info-cache
 \#auto_saved_files\#
 _autosave-*
 
+# Ignore KiCAD gerber output
+Gerber/
+Gerber.zip
+
 .cache/
 build/
 
