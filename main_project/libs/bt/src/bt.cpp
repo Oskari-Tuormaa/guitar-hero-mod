@@ -65,7 +65,8 @@ void link_key_iterator_try_next()
 void transmit_report(const report_t& report)
 {
     std::array<uint8_t, 2 + sizeof(report)> message { 0xa1, config::report_id };
-    std::memcpy(&message[2], &report, sizeof(report));
+    packed_report_t                         packed_report = report.to_packed();
+    std::memcpy(&message[2], &packed_report, sizeof(packed_report));
     hid_device_send_interrupt_message(globals::hid_cid, message.begin(),
                                       message.size());
 }

@@ -143,7 +143,7 @@ enum HatSwitchDirections
     HATSWITCH_NONE      = 0x0F,
 };
 
-struct report_t
+struct packed_report_t
 {
     uint8_t x;
     uint8_t y;
@@ -173,4 +173,60 @@ struct report_t
     uint8_t hat : 4;
 
     uint8_t : 4;
+};
+
+struct report_t
+{
+    uint8_t x;
+    uint8_t y;
+
+    uint8_t rx;
+    uint8_t ry;
+
+    uint8_t z;
+    uint8_t rz;
+
+    bool b0;
+    bool b1;
+    bool b2;
+    bool b3;
+    bool b4;
+    bool b5;
+    bool b8;
+    bool b9;
+    bool b16;
+    bool b17;
+    bool b18;
+    bool b6;
+    bool b7;
+
+    uint8_t hat;
+
+    [[nodiscard]] packed_report_t to_packed() const
+    {
+        return { .x = x,
+                 .y = y,
+
+                 .rx = rx,
+                 .ry = ry,
+
+                 .z  = z,
+                 .rz = rz,
+
+                 .b0  = b0,
+                 .b1  = b1,
+                 .b2  = b2,
+                 .b3  = b3,
+                 .b4  = b4,
+                 .b5  = b5,
+                 .b8  = b8,
+                 .b9  = b9,
+                 .b16 = b16,
+                 .b17 = b17,
+                 .b18 = b18,
+                 .b6  = b6,
+                 .b7  = b7,
+
+                 .hat = hat };
+    }
 };
