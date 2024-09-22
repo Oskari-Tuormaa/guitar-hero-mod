@@ -4,7 +4,8 @@ set(PICO_BOARD pico_w)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-include(../3rdparty/pico-sdk/pico_sdk_init.cmake)
+include(../3rdparty/pico-sdk/external/pico_sdk_import.cmake)
+include(../3rdparty/pico-extras/external/pico_extras_import.cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
@@ -26,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
     pubsub_lib
     parray_lib
     buttons_lib
+    shutdown_lib
     pico_stdlib
     pico_btstack_classic
     pico_btstack_cyw43

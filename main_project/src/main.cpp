@@ -10,6 +10,7 @@
 #include "bt_reconnect.hpp"
 #include "buttons.hpp"
 #include "hid_stuff.h"
+#include "shutdown.hpp"
 #include "timer.hpp"
 
 #include "topics.hpp"
@@ -161,10 +162,7 @@ struct PinMapping
 };
 
 auto pin_mappings = std::to_array<PinMapping>({
-    { .gpio = 5, .button = &globals::report.b0 },
-    { .gpio = 6, .button = &globals::report.b1 },
-    { .gpio = 7, .button = &globals::report.b2 },
-    { .gpio = 8, .button = &globals::report.b3 },
+    { .gpio = 14, .button = &globals::report.b0 },
 });
 
 void gpio_interrupt_callback2(uint pin, uint32_t mask)
@@ -194,12 +192,14 @@ int main()
     init_reconnect();
 
     init_bt();
-    /*set_on_connected_callback([] {*/
+    /*Topic::BluetoothConnected::subscribe([](auto) {*/
     /*    globals::dummy_output_state = 0;*/
     /*    globals::timers::dummy_start_stop_timer.start();*/
     /*});*/
 
     /*globals::timers::dummy_report_timer.start();*/
+
+    init_shutdown();
 
     for (auto mapping : pin_mappings)
     {
@@ -207,9 +207,14 @@ int main()
     }
 
     Topic::ButtonStateChange::subscribe([](Topic::ButtonStateChange ev) {
-        for (PinMapping map : pin_mappings) {
-            if (map.gpio == ev.button_gpio) {
-                *map.button = ev.new_state == Topic::ButtonStateChange::ButtonState::PRESSED;
+        for (PinMapping map : pin_mappings)
+        {
+            if (map.gpio == ev.button_gpio)
+            {
+                *map.button = ev.new_state
+                           == Topic::ButtonStateChange::ButtonState::PRESSED;
+                printf("BTN\n");
+                send_report(globals::report);
                 return;
             }
         }

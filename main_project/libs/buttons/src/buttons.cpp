@@ -1,6 +1,9 @@
 #include "buttons.hpp"
-
 #include "topics.hpp"
+
+#include <array>
+
+static std::array<uint, 32> integrators;
 
 void gpio_interrupt_callback(uint pin, uint32_t mask)
 {
