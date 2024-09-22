@@ -23,7 +23,9 @@ pico_enable_stdio_uart(${PROJECT_NAME} 1)
 
 target_link_libraries(${PROJECT_NAME}
     bt_lib
-    btstack_helpers_lib
+    pubsub_lib
+    parray_lib
+    buttons_lib
     pico_stdlib
     pico_btstack_classic
     pico_btstack_cyw43

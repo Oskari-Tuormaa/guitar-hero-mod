@@ -7,7 +7,8 @@
 #include <pico/cyw43_arch.h>
 #include <pico/stdlib.h>
 
-#include "bt.hpp"
+#include "bt_init.hpp"
+#include "topics.hpp"
 
 namespace globals
 {
@@ -16,9 +17,6 @@ namespace globals
 
     static bool connected = false;
 
-    static bool                        trying_to_connect = false;
-    static btstack_link_key_iterator_t link_key_it;
-
     static stdext::inplace_function<void()> on_connected_callback;
 
     static btstack_packet_callback_registration_t packet_callbacks;
@@ -26,41 +24,8 @@ namespace globals
     static uint16_t hid_cid;
 
     static report_t report;
+
 } // namespace globals
-
-void link_key_iterator_init()
-{
-    gap_link_key_iterator_init(&globals::link_key_it);
-}
-
-void link_key_iterator_done()
-{
-    if (globals::trying_to_connect)
-    {
-        gap_link_key_iterator_done(&globals::link_key_it);
-        globals::trying_to_connect = false;
-    }
-}
-
-void link_key_iterator_try_next()
-{
-    bd_addr_t       addr;
-    link_key_t      link_key;
-    link_key_type_t type;
-
-    if (gap_link_key_iterator_get_next(&globals::link_key_it, addr, link_key,
-                                       &type))
-    {
-        printf("Trying to connect to %s - type %u...\n", bd_addr_to_str(addr),
-               (int)type);
-        hid_device_connect(addr, &globals::hid_cid);
-    }
-    else
-    {
-        printf("Done trying...\n");
-        link_key_iterator_done();
-    }
-}
 
 void transmit_report(const report_t& report)
 {
@@ -84,20 +49,22 @@ void hid_event_handler(uint8_t* packet)
             printf("Connection failed, status 0x%x\r\n", status);
             globals::hid_cid   = 0;
             globals::connected = false;
-            return;
         }
-        printf("Connection opened\r\n");
-        globals::on_connected_callback();
-        globals::hid_cid   = hid_subevent_connection_opened_get_hid_cid(packet);
-        globals::connected = true;
-        link_key_iterator_done();
+        else
+        {
+            printf("Connection opened\r\n");
+            globals::on_connected_callback();
+            globals::hid_cid
+                = hid_subevent_connection_opened_get_hid_cid(packet);
+            globals::connected = true;
+        }
+        Topic::BluetoothConnected::publish({ .connected = globals::connected });
         break;
     case HID_SUBEVENT_CONNECTION_CLOSED:
         printf("Connection closed\r\n");
         globals::hid_cid   = 0;
         globals::connected = false;
-        link_key_iterator_init();
-        link_key_iterator_try_next();
+        Topic::BluetoothDisconnected::publish({});
         break;
     case HID_SUBEVENT_CAN_SEND_NOW:
         transmit_report(globals::report);
@@ -128,8 +95,7 @@ void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* packet,
         {
         case HCI_STATE_WORKING:
             printf("Bluetooth running!\n");
-            link_key_iterator_init();
-            link_key_iterator_try_next();
+            Topic::BluetoothReady::publish({});
             break;
         default:
             printf("New BT state: 0x%02x\r\n", state);
@@ -226,11 +192,6 @@ bool is_connected()
     return globals::connected;
 }
 
-void set_on_connected_callback(stdext::inplace_function<void()> callback)
-{
-    globals::on_connected_callback = std::move(callback);
-}
-
 void send_report(const report_t& report)
 {
     if (is_connected())
@@ -238,4 +199,9 @@ void send_report(const report_t& report)
         globals::report = report;
         hid_device_request_can_send_now_event(globals::hid_cid);
     }
+}
+
+uint16_t* get_hid_cid()
+{
+    return &globals::hid_cid;
 }

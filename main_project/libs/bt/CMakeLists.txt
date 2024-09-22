@@ -1,8 +1,11 @@
-add_library(bt_lib ./src/bt.cpp)
+add_subdirectory(./bt_init)
+add_subdirectory(./bt_config)
+add_subdirectory(./btstack_helpers)
+add_subdirectory(./bt_reconnect)
 
-target_include_directories(bt_lib PUBLIC ./include)
-target_link_libraries(bt_lib
-    sg14_lib
+add_library(bt_lib INTERFACE)
+target_link_libraries(bt_lib INTERFACE
+    bt_init_lib
+    bt_config_lib
     btstack_helpers_lib
-    pico_stdlib
-    bt_config_lib)
+    bt_reconnect_lib)

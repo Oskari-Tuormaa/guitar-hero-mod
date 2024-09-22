@@ -1,12 +1,18 @@
+#include <array>
 #include <btstack.h>
 
 #include <cstring>
+#include <hardware/gpio.h>
 #include <pico/cyw43_arch.h>
 #include <pico/stdlib.h>
 
-#include "bt.hpp"
+#include "bt_init.hpp"
+#include "bt_reconnect.hpp"
+#include "buttons.hpp"
 #include "hid_stuff.h"
 #include "timer.hpp"
+
+#include "topics.hpp"
 
 enum class DummyOutputState
 {
@@ -148,6 +154,34 @@ void dummy_start_stop_handler()
     }
 }
 
+struct PinMapping
+{
+    int   gpio;
+    bool* button;
+};
+
+auto pin_mappings = std::to_array<PinMapping>({
+    { .gpio = 5, .button = &globals::report.b0 },
+    { .gpio = 6, .button = &globals::report.b1 },
+    { .gpio = 7, .button = &globals::report.b2 },
+    { .gpio = 8, .button = &globals::report.b3 },
+});
+
+void gpio_interrupt_callback2(uint pin, uint32_t mask)
+{
+    bool new_value = mask == GPIO_IRQ_EDGE_FALL;
+    for (auto mapping : pin_mappings)
+    {
+        if (pin == mapping.gpio)
+        {
+            *mapping.button = new_value;
+            printf("%d: %d\n", pin, new_value);
+            break;
+        }
+    }
+    send_report(globals::report);
+}
+
 int main()
 {
     stdio_init_all();
@@ -157,16 +191,29 @@ int main()
 
     cyw43_arch_init();
 
+    init_reconnect();
+
     init_bt();
-    set_on_connected_callback([] {
-        globals::dummy_output_state = 0;
-        globals::timers::dummy_start_stop_timer.start();
+    /*set_on_connected_callback([] {*/
+    /*    globals::dummy_output_state = 0;*/
+    /*    globals::timers::dummy_start_stop_timer.start();*/
+    /*});*/
+
+    /*globals::timers::dummy_report_timer.start();*/
+
+    for (auto mapping : pin_mappings)
+    {
+        register_button_state_listener(mapping.gpio);
+    }
+
+    Topic::ButtonStateChange::subscribe([](Topic::ButtonStateChange ev) {
+        for (PinMapping map : pin_mappings) {
+            if (map.gpio == ev.button_gpio) {
+                *map.button = ev.new_state == Topic::ButtonStateChange::ButtonState::PRESSED;
+                return;
+            }
+        }
     });
-
-    globals::timers::dummy_report_timer.start();
-
-    OneShotTimer t1 { [] { printf("T1\n"); }, time_to_ms(1, 500) };
-    t1.start();
 
     printf("GO\n");
     btstack_run_loop_execute();

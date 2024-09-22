@@ -29,9 +29,11 @@ namespace config
     } // namespace hid
 } // namespace config
 
-using OnConnectedCallback = stdext::inplace_function<void()>;
+using GenericBTCallback = stdext::inplace_function<void()>;
+using OnConnectedCallback = stdext::inplace_function<void(bool)>;
 
 void init_bt();
 bool is_connected();
-void set_on_connected_callback(OnConnectedCallback callback);
 void send_report(const report_t& report);
+
+uint16_t* get_hid_cid();
