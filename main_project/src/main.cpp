@@ -163,6 +163,14 @@ struct PinMapping
 
 auto pin_mappings = std::to_array<PinMapping>({
     { .gpio = 14, .button = &globals::report.b0 },
+    { .gpio = 13, .button = &globals::report.b1 },
+    { .gpio = 12, .button = &globals::report.b2 },
+    { .gpio = 11, .button = &globals::report.b3 },
+    { .gpio = 10, .button = &globals::report.b4 },
+    { .gpio = 3, .button = &globals::report.b17 },
+    { .gpio = 4, .button = &globals::report.b18 },
+    { .gpio = 1, .button = &globals::report.b8 },
+    { .gpio = 2, .button = &globals::report.b9 },
 });
 
 void gpio_interrupt_callback2(uint pin, uint32_t mask)
@@ -192,14 +200,14 @@ int main()
     init_reconnect();
 
     init_bt();
+
     /*Topic::BluetoothConnected::subscribe([](auto) {*/
     /*    globals::dummy_output_state = 0;*/
     /*    globals::timers::dummy_start_stop_timer.start();*/
     /*});*/
-
     /*globals::timers::dummy_report_timer.start();*/
 
-    init_shutdown();
+    /*init_shutdown();*/
 
     for (auto mapping : pin_mappings)
     {

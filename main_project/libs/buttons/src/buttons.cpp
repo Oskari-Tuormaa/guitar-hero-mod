@@ -7,9 +7,9 @@ static std::array<uint, 32> integrators;
 
 void gpio_interrupt_callback(uint pin, uint32_t mask)
 {
-    auto state = mask == GPIO_IRQ_EDGE_FALL
-                   ? Topic::ButtonStateChange::ButtonState::PRESSED
-                   : Topic::ButtonStateChange::ButtonState::RELEASED;
+    auto state = gpio_get(pin)
+                   ? Topic::ButtonStateChange::ButtonState::RELEASED
+                   : Topic::ButtonStateChange::ButtonState::PRESSED;
 
     Topic::ButtonStateChange::publish(
         { .new_state = state, .button_gpio = pin });
