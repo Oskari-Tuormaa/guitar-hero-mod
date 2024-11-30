@@ -7,3 +7,6 @@
 [submodule "3rdparty/pico-extras"]
 	path = 3rdparty/pico-extras
 	url = git@github.com:raspberrypi/pico-extras
+[submodule "3rdparty/espressif-kicad-libraries"]
+	path = 3rdparty/espressif-kicad-libraries
+	url = https://github.com/espressif/kicad-libraries
