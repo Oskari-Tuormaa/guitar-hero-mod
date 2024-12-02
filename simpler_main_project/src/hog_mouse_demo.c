@@ -35,6 +35,10 @@
  *
  */
 
+#include <hardware/rosc.h>
+#include <hardware/structs/rosc.h>
+#include <hardware/watchdog.h>
+#include <pico/stdio.h>
 #include <pico/time.h>
 #define BTSTACK_FILE__ "hog_mouse_demo.c"
 
@@ -61,6 +65,8 @@
 
 #define BIT(n)  (1 << n)
 #define IBIT(n) (~(1 << n))
+
+static bool should_restart_timer = false;
 
 struct __attribute__((packed)) GamepadReport
 {
@@ -235,11 +241,11 @@ static void send_report(uint16_t buttons, uint8_t hat)
     default:
         break;
     }
-    printf("buttons: 0x%04x   hat: 0x%02x\n", report.buttons, report.hat);
+    /*printf("buttons: 0x%04x   hat: 0x%02x\n", report.buttons, report.hat);*/
 }
 
 static uint16_t buttons = 0;
-static uint8_t  hat = HATSWITCH_NONE;
+static uint8_t  hat     = HATSWITCH_NONE;
 
 static void mousing_can_send_now(void)
 {
@@ -265,6 +271,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel,
     case HCI_EVENT_DISCONNECTION_COMPLETE:
         con_handle = HCI_CON_HANDLE_INVALID;
         printf("Disconnected\n");
+        should_restart_timer = true;
         break;
     case SM_EVENT_JUST_WORKS_REQUEST:
         printf("Just Works requested\n");
@@ -298,6 +305,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel,
             printf(
                 "- Connection Latency: %u\n",
                 gap_subevent_le_connection_complete_get_conn_latency(packet));
+            should_restart_timer = true;
             break;
         default:
             break;
@@ -426,12 +434,54 @@ static const uint8_t dpad_enum_map[] = {
 
 static uint8_t dpad_gpio_state = 0;
 
+static btstack_timer_source_t shutdown_timer;
+static btstack_timer_source_t restart_shutdown_timer;
+static btstack_timer_source_t hid_output_timer;
+
+static bool should_hid_output = false;
+
+#define SHUTDOWN_TIMEOUT 20000
+#define RESTART_SHUTDOWN_TIMEOUT 500
+#define HID_OUTPUT_TIMEOUT 5
+
+void shutdown_timer_callback(btstack_timer_source_t* ts)
+{
+    btstack_run_loop_trigger_exit();
+}
+
+void restart_shutdown_timer_callback(btstack_timer_source_t* ts)
+{
+    if (should_restart_timer)
+    {
+        btstack_run_loop_remove_timer(&shutdown_timer);
+        btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT);
+        btstack_run_loop_add_timer(&shutdown_timer);
+        should_restart_timer = false;
+    }
+
+    btstack_run_loop_set_timer(&restart_shutdown_timer, RESTART_SHUTDOWN_TIMEOUT);
+    btstack_run_loop_add_timer(&restart_shutdown_timer);
+}
+
+void hid_output_timer_callback(btstack_timer_source_t* ts)
+{
+    if (should_hid_output)
+    {
+        hids_device_request_can_send_now_event(con_handle);
+        should_hid_output = false;
+    }
+    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT);
+    btstack_run_loop_add_timer(&hid_output_timer);
+}
+
 void gpio_callback(uint gpio, uint32_t event_mask)
 {
+    should_restart_timer = true;
+
     if (con_handle == HCI_CON_HANDLE_INVALID)
         return;
 
-    busy_wait_ms(2);
+    busy_wait_ms(5);
     uint8_t bit = gpio_bit_map[gpio];
 
     if (contains(gpio, btn_gpios, sizeof(btn_gpios)))
@@ -450,7 +500,7 @@ void gpio_callback(uint gpio, uint32_t event_mask)
         hat = dpad_enum_map[dpad_gpio_state];
     }
 
-    hids_device_request_can_send_now_event(con_handle);
+    should_hid_output = true;
 }
 
 int btstack_main(void)
@@ -459,6 +509,21 @@ int btstack_main(void)
 
     // turn on!
     hci_power_control(HCI_POWER_ON);
+
+    btstack_run_loop_set_timer_handler(&shutdown_timer,
+                                       shutdown_timer_callback);
+    btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT);
+    btstack_run_loop_add_timer(&shutdown_timer);
+
+    btstack_run_loop_set_timer_handler(&restart_shutdown_timer,
+                                       restart_shutdown_timer_callback);
+    btstack_run_loop_set_timer(&restart_shutdown_timer, RESTART_SHUTDOWN_TIMEOUT);
+    btstack_run_loop_add_timer(&restart_shutdown_timer);
+
+    btstack_run_loop_set_timer_handler(&hid_output_timer,
+                                       hid_output_timer_callback);
+    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT);
+    btstack_run_loop_add_timer(&hid_output_timer);
 
     for (size_t i = 0; i < sizeof(btn_gpios); i++)
     {

@@ -4,6 +4,9 @@ set(PICO_BOARD pico_w)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+set(PICO_DEOPTIMIZED_DEBUG 0)
+set(CMAKE_BUILD_TYPE Release)
+
 include(../3rdparty/pico-sdk/external/pico_sdk_import.cmake)
 include(../3rdparty/pico-extras/external/pico_extras_import.cmake)
 
@@ -26,7 +29,8 @@ target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     pico_btstack_ble
     pico_btstack_cyw43
-    pico_cyw43_arch_none)
+    pico_cyw43_arch_none
+    hardware_sleep)
 
 pico_add_extra_outputs(${PROJECT_NAME})
 

@@ -27,8 +27,8 @@
 #endif
 
 // BTstack configuration. buffers, sizes, ...
-#define HCI_OUTGOING_PRE_BUFFER_SIZE 4
-#define HCI_ACL_PAYLOAD_SIZE (1691 + 4)
+#define HCI_OUTGOING_PRE_BUFFER_SIZE 16
+#define HCI_ACL_PAYLOAD_SIZE (4096)
 #define HCI_ACL_CHUNK_SIZE_ALIGNMENT 4
 #define MAX_NR_AVDTP_CONNECTIONS 1
 #define MAX_NR_AVDTP_STREAM_ENDPOINTS 1
