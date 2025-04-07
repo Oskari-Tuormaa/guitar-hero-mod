@@ -35,6 +35,7 @@
  *
  */
 
+#include <hardware/adc.h>
 #include <hardware/rosc.h>
 #include <hardware/structs/rosc.h>
 #include <hardware/watchdog.h>
@@ -65,6 +66,10 @@
 
 #define BIT(n)  (1 << n)
 #define IBIT(n) (~(1 << n))
+
+#define T_MS(x)  (x)
+#define T_SEC(x) (1000 * T_MS(x))
+#define T_MIN(x) (60 * T_SEC(x))
 
 static bool should_restart_timer = false;
 
@@ -306,6 +311,9 @@ static void packet_handler(uint8_t packet_type, uint16_t channel,
                 "- Connection Latency: %u\n",
                 gap_subevent_le_connection_complete_get_conn_latency(packet));
             should_restart_timer = true;
+
+            gap_set_connection_parameters(0x0060, 0x0030, 0x08, 0x18, 0, 0x0048,
+                                          2, 0x0030);
             break;
         default:
             break;
@@ -342,6 +350,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel,
             // Bluetooth Design Guidelines
             // gap_request_connection_parameter_update(con_handle, 12, 12, 4,
             // 100);    // 15 ms, 4, 1s
+            gap_request_connection_parameter_update(con_handle, 6, 6, 0, 100);
 
             // directly update connection params via HCI following Apple
             // Bluetooth Design Guidelines
@@ -432,37 +441,35 @@ static const uint8_t dpad_enum_map[] = {
     HATSWITCH_NONE, // 0b1111
 };
 
-static uint8_t dpad_gpio_state = 0;
+static uint8_t dpad_gpio_state   = 0;
+static bool    should_hid_output = false;
 
 static btstack_timer_source_t shutdown_timer;
-static btstack_timer_source_t restart_shutdown_timer;
-static btstack_timer_source_t hid_output_timer;
-
-static bool should_hid_output = false;
-
-#define SHUTDOWN_TIMEOUT 20000
-#define RESTART_SHUTDOWN_TIMEOUT 500
-#define HID_OUTPUT_TIMEOUT 5
-
+#define SHUTDOWN_TIMEOUT_MS T_MIN(1)
 void shutdown_timer_callback(btstack_timer_source_t* ts)
 {
     btstack_run_loop_trigger_exit();
 }
 
+static btstack_timer_source_t restart_shutdown_timer;
+#define RESTART_SHUTDOWN_TIMEOUT_MS 500
 void restart_shutdown_timer_callback(btstack_timer_source_t* ts)
 {
     if (should_restart_timer)
     {
         btstack_run_loop_remove_timer(&shutdown_timer);
-        btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT);
+        btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT_MS);
         btstack_run_loop_add_timer(&shutdown_timer);
         should_restart_timer = false;
     }
 
-    btstack_run_loop_set_timer(&restart_shutdown_timer, RESTART_SHUTDOWN_TIMEOUT);
+    btstack_run_loop_set_timer(&restart_shutdown_timer,
+                               RESTART_SHUTDOWN_TIMEOUT_MS);
     btstack_run_loop_add_timer(&restart_shutdown_timer);
 }
 
+static btstack_timer_source_t hid_output_timer;
+#define HID_OUTPUT_TIMEOUT_MS 5
 void hid_output_timer_callback(btstack_timer_source_t* ts)
 {
     if (should_hid_output)
@@ -470,8 +477,31 @@ void hid_output_timer_callback(btstack_timer_source_t* ts)
         hids_device_request_can_send_now_event(con_handle);
         should_hid_output = false;
     }
-    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT);
+    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT_MS);
     btstack_run_loop_add_timer(&hid_output_timer);
+}
+
+static btstack_timer_source_t battery_sense_timer;
+#define BATTERY_SENSE_TIMEOUT_MS T_SEC(1)
+void battery_sense_timer_callback(btstack_timer_source_t* ts)
+{
+    const float conversion_factor = 3.3f / (1 << 12);
+
+    gpio_put(26, true);
+
+    busy_wait_ms(100);
+
+    float batt_raw = (float)adc_read();
+    gpio_put(26, false);
+
+    float batt = 100 * batt_raw * conversion_factor;
+
+    // printf("Reading battery %f!\n", batt);
+
+    battery_service_server_set_battery_value((uint8_t)batt);
+
+    btstack_run_loop_set_timer(&battery_sense_timer, BATTERY_SENSE_TIMEOUT_MS);
+    btstack_run_loop_add_timer(&battery_sense_timer);
 }
 
 void gpio_callback(uint gpio, uint32_t event_mask)
@@ -481,7 +511,7 @@ void gpio_callback(uint gpio, uint32_t event_mask)
     if (con_handle == HCI_CON_HANDLE_INVALID)
         return;
 
-    busy_wait_ms(5);
+    busy_wait_ms(2);
     uint8_t bit = gpio_bit_map[gpio];
 
     if (contains(gpio, btn_gpios, sizeof(btn_gpios)))
@@ -510,21 +540,6 @@ int btstack_main(void)
     // turn on!
     hci_power_control(HCI_POWER_ON);
 
-    btstack_run_loop_set_timer_handler(&shutdown_timer,
-                                       shutdown_timer_callback);
-    btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT);
-    btstack_run_loop_add_timer(&shutdown_timer);
-
-    btstack_run_loop_set_timer_handler(&restart_shutdown_timer,
-                                       restart_shutdown_timer_callback);
-    btstack_run_loop_set_timer(&restart_shutdown_timer, RESTART_SHUTDOWN_TIMEOUT);
-    btstack_run_loop_add_timer(&restart_shutdown_timer);
-
-    btstack_run_loop_set_timer_handler(&hid_output_timer,
-                                       hid_output_timer_callback);
-    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT);
-    btstack_run_loop_add_timer(&hid_output_timer);
-
     for (size_t i = 0; i < sizeof(btn_gpios); i++)
     {
         gpio_pull_up(btn_gpios[i]);
@@ -540,6 +555,35 @@ int btstack_main(void)
             dpad_gpios[i], GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true,
             gpio_callback);
     }
+
+    adc_init();
+
+    adc_gpio_init(27);
+    adc_select_input(1);
+
+    gpio_init(26);
+    gpio_set_dir(26, true);
+
+    btstack_run_loop_set_timer_handler(&shutdown_timer,
+                                       shutdown_timer_callback);
+    btstack_run_loop_set_timer(&shutdown_timer, SHUTDOWN_TIMEOUT_MS);
+    btstack_run_loop_add_timer(&shutdown_timer);
+
+    btstack_run_loop_set_timer_handler(&restart_shutdown_timer,
+                                       restart_shutdown_timer_callback);
+    btstack_run_loop_set_timer(&restart_shutdown_timer,
+                               RESTART_SHUTDOWN_TIMEOUT_MS);
+    btstack_run_loop_add_timer(&restart_shutdown_timer);
+
+    btstack_run_loop_set_timer_handler(&hid_output_timer,
+                                       hid_output_timer_callback);
+    btstack_run_loop_set_timer(&hid_output_timer, HID_OUTPUT_TIMEOUT_MS);
+    btstack_run_loop_add_timer(&hid_output_timer);
+
+    btstack_run_loop_set_timer_handler(&battery_sense_timer,
+                                       battery_sense_timer_callback);
+    btstack_run_loop_set_timer(&battery_sense_timer, BATTERY_SENSE_TIMEOUT_MS);
+    btstack_run_loop_add_timer(&battery_sense_timer);
 
     return 0;
 }

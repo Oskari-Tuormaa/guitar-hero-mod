@@ -30,7 +30,8 @@ target_link_libraries(${PROJECT_NAME}
     pico_btstack_ble
     pico_btstack_cyw43
     pico_cyw43_arch_none
-    hardware_sleep)
+    hardware_sleep
+    hardware_adc)
 
 pico_add_extra_outputs(${PROJECT_NAME})
 
