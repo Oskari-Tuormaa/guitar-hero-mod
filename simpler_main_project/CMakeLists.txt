@@ -16,9 +16,15 @@ project(guitar-hero-mod)
 
 pico_sdk_init()
 
-add_executable(${PROJECT_NAME} src/hog_mouse_demo.c src/main.c)
+add_executable(${PROJECT_NAME}
+    src/main.cpp
+    src/bt.cpp
+    src/hid.cpp
+    src/buttons.cpp
+    src/shutdown.cpp
+    src/battery.cpp)
 
-pico_btstack_make_gatt_header(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/hog_mouse_demo.gatt)
+pico_btstack_make_gatt_header(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/kitara.gatt)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 

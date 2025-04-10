@@ -1,28 +1,31 @@
+#include "bt.hpp"
+#include "battery.hpp"
+#include "buttons.hpp"
+#include "shutdown.hpp"
+
 #include <hardware/clocks.h>
 #include <hardware/rosc.h>
 #include <hardware/structs/rosc.h>
 #include <hardware/uart.h>
 #include <hardware/watchdog.h>
-
 #include <hci.h>
-
 #include <pico/cyw43_arch.h>
 #include <pico/runtime_init.h>
 #include <pico/sleep.h>
 #include <pico/stdlib.h>
 
-#include <btstack_run_loop.h>
-
-int btstack_main(void);
-
-int main() {
+int main()
+{
     stdio_init_all();
 
     cyw43_arch_init();
 
     printf("Hello world!\n");
 
-    btstack_main();
+    bt::init();
+    buttons::init();
+    shutdown::init();
+    battery::init();
 
     printf("Starting loop\n");
     btstack_run_loop_execute();
@@ -34,9 +37,9 @@ int main() {
     printf("HCI shutdown\n");
     uart_default_tx_wait_blocking();
 
-    uint scb_orig = scb_hw->scr;
-	uint clock0_orig = clocks_hw->sleep_en0;
-	uint clock1_orig = clocks_hw->sleep_en1;
+    uint scb_orig    = scb_hw->scr;
+    uint clock0_orig = clocks_hw->sleep_en0;
+    uint clock1_orig = clocks_hw->sleep_en1;
 
     gpio_pull_up(2);
     sleep_run_from_xosc();
@@ -45,7 +48,7 @@ int main() {
 
     rosc_write(&rosc_hw->ctrl, ROSC_CTRL_ENABLE_LSB);
 
-    scb_hw->scr = scb_orig;
+    scb_hw->scr          = scb_orig;
     clocks_hw->sleep_en0 = clock0_orig;
     clocks_hw->sleep_en1 = clock1_orig;
 
@@ -59,5 +62,6 @@ int main() {
     /*uart_default_tx_wait_blocking();*/
 
     watchdog_enable(100, true);
-    while (true);
+    while (true)
+        ;
 }
